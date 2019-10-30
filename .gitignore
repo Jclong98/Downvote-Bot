@@ -1,0 +1,7 @@
+credentials.json
+db.sqlite
+.vscode/
+__pycache__/
+dvb_old.py
+ffmpeg.exe
+venv/
