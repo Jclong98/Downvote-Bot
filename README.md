@@ -68,7 +68,7 @@ set up virtual environment:
 
 `pip install -r requirements.txt`
 
-`python dvb3.0.py`
+`python dvb.py`
 
 OR
 
