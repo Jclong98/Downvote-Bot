@@ -11,7 +11,8 @@ WORKDIR /app
 ADD . /app
 
 RUN apk add  --no-cache ffmpeg
-RUN apt-get install libsodium-dev
+RUN apk add  --no-cache libsodium-dev
+# RUN apt-get install 
 
 RUN pip install --upgrade pip
 RUN pip install setuptools
