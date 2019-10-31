@@ -10,8 +10,7 @@ LABEL Name=dvb
 WORKDIR /app
 ADD . /app
 
-RUN apk add  --no-cache ffmpeg
-RUN apk add  --no-cache libsodium-dev
+RUN apk add  --no-cache ffmpeg gcc libsodium-dev
 # RUN apt-get install 
 
 RUN pip install --upgrade pip
