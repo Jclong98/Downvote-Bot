@@ -12,6 +12,7 @@ ADD . /app
 
 RUN apk add  --no-cache ffmpeg
 
+RUN pip install --upgrade pip
 RUN python3 -m pip install -r requirements.txt
 
 CMD ["python3", "dvb.py"]
