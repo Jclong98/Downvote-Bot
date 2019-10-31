@@ -156,6 +156,9 @@ async def on_message(message):
         await message.add_reaction("😎")
         await message.add_reaction("👉")
 
+    if message.content.lower().startswith("#sans"):
+        await sans(message, conn)
+
 
 if __name__ == "__main__":
     

@@ -3,7 +3,7 @@ a collection of functions for dvb.py to use to react to
 things and interact with the database
 """
 
-
+import asyncio
 import json
 import random
 import re
@@ -460,6 +460,37 @@ async def invite(message, con):
     await message.channel.send("Use this link to invite me to other servers https://discordapp.com/api/oauth2/authorize?client_id=412495164200714251&permissions=54000704&scope=bot")
     add_action(message, "invited", con)
 
+async def sans(message, con):
+    """dvb joins the channel of whoever sent the command 
+    and play sans talking for a given number of seconds."""
+
+    # checking to see if dvb can join the channel
+    try:
+        channel = message.author.voice.channel
+    except:
+        await message.channel.send(f"If you aren't there {message.author.mention}, I can't join!")
+        return
+
+    # VoiceClient
+    vc = await channel.connect()
+    vc.play(discord.FFmpegPCMAudio("./static/Just Sans talking.mp3"))
+    
+    # getting duration
+    try:
+        duration = int(message.content.split()[1])
+    except:
+        duration = 2
+    
+    # 121 is the length of the audio file in seconds.
+    # this is here so that it doesn't try to loop or anything weird
+    if duration > 121:
+        duration = 2
+
+    # sleeping for the input duration
+    await asyncio.sleep(duration)
+
+    # when the player is done, disconnect from the channel
+    await vc.disconnect()
 
 async def help_message(message, con):
     help_message = f"""
