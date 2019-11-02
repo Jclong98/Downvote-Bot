@@ -159,6 +159,9 @@ async def on_message(message):
     if message.content.lower().startswith("#sans"):
         await sans(message, conn)
 
+    if message.content.lower().startswith("#stats"):
+        await stats(message, conn)
+
 
 if __name__ == "__main__":
     
@@ -166,9 +169,9 @@ if __name__ == "__main__":
     creds = json.load(open("./credentials.json"))
 
     # testbot
-    # bot.run(creds['discord_secret_key_testbot'])
+    bot.run(creds['discord_secret_key_testbot'])
 
     # downvotebot
-    bot.run(creds['discord_secret_key'])
+    # bot.run(creds['discord_secret_key'])
 
 

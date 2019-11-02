@@ -57,7 +57,7 @@ def add_action(message, action, con):
     # inserting a record into the db
     with con as c:
         c.execute(
-            f"insert into actions (action_time, action, author, author_id, channel, channel_id, guild, guild_id) values (:action_time, :action, :author, :author_id, :channel, :channel_id, :guild, :guild_id)",
+            "insert into actions (action_time, action, author, author_id, channel, channel_id, guild, guild_id) values (:action_time, :action, :author, :author_id, :channel, :channel_id, :guild, :guild_id)",
             {
                 "action_time":datetime.now(), 
                 "action":action, 
@@ -220,13 +220,23 @@ async def vote(message, con):
             }
         ).fetchall()
 
-    for v in voteables:
-        if v[0] in message.content.lower():
-            if v[1] == 'down':
+    downvoted = False
+    upvoted = False
+    
+    for row in voteables:
+        if row[0] in message.content.lower():
+            if row[1] == 'down':
                 await message.add_reaction("<:downvote:596443285606760449>")
+                downvoted = True
             else:
                 await message.add_reaction("<:upvote:596443285656961044>")
+                upvoted = True
 
+    if downvoted:
+        add_action(message, "downvoted", con)
+    if upvoted:
+        add_action(message, "upvoted", con)
+    
 
 async def owo(message, con):
     """sends a response from a list of owo's to a message containing owo"""
@@ -435,7 +445,7 @@ async def download_vreddit(message, con, url):
 
         # creating a discord embed to send from the user
         embed = discord.Embed(
-            colour=0x8080FF,
+            color=discord.Color.from_rgb(128,128,255),
         )
         embed.add_field(name=post.title, value=f"[Jump!]({message.jump_url})", inline=True)
         embed.set_footer(text=f"Requested by: {message.author}", icon_url=message.author.avatar_url)
@@ -491,6 +501,114 @@ async def sans(message, con):
 
     # when the player is done, disconnect from the channel
     await vc.disconnect()
+    add_action(message, "sans'd", con)
+
+
+async def send_user_stats(user, channel, con):
+    """
+    send stats in a specific channel for a certain user
+    """
+    embed = discord.Embed(
+        title=f"{user.display_name}'s Stats:",
+        color=discord.Color.from_rgb(128,128,255)
+    )
+    embed.set_thumbnail(url=user.avatar_url)
+
+    with con as c:
+        total_actions = c.execute(
+            """
+            select count(*) from actions
+            where guild_id = :guild_id
+            and author_id = :author_id
+            """,
+            {                
+                "guild_id":channel.guild.id,
+                "author_id":user.id,
+            }
+        ).fetchall()[0][0]
+        print(total_actions)
+        embed.add_field(name="Total Actions", value=total_actions, inline=True)
+
+        # top 5 actions
+        top_actions = c.execute(
+            """
+            select action, count(action) from actions
+            where guild_id = :guild_id
+            and author_id = :author_id
+            group by action
+            order by 2 desc
+            limit 5
+            """,
+            {                
+                "guild_id":channel.guild.id,
+                "author_id":user.id,
+            }                
+        ).fetchall()
+        print(top_actions)
+
+        if top_actions:
+            top_actions_str = ""
+            for action, count in top_actions:
+                top_actions_str += f"{action}:\t{count}\n"
+            embed.add_field(name="Top Actions", value=top_actions_str, inline=True)
+
+    await channel.send(embed=embed)
+    
+
+async def stats(message, con):
+    """
+    send stats about a server
+    if users are mentiond, send stats about them
+    """
+    if message.mentions:
+        for user in message.mentions:
+            await send_user_stats(user, message.channel, con)
+
+    else:
+        
+        with con as c:
+
+            # getting the total amount of times dvb has reacted to things
+            total_actions = c.execute(
+                """
+                select count(*) from actions
+                where guild_id = :guild_id
+                """,
+                {                
+                    "guild_id":message.channel.guild.id,
+                }
+            ).fetchall()[0][0]
+
+            # top 5 actions
+            top_actions = c.execute(
+                """
+                select action, count(action) from actions
+                where guild_id = :guild_id
+                group by action
+                order by 2 desc
+                limit 5
+                """,
+                {                
+                    "guild_id":message.channel.guild.id,
+                }                
+            ).fetchall()
+
+            top_actions_str = ""
+            for action, count in top_actions:
+                top_actions_str += f"{action}:\t{count}\n"
+
+
+        embed = discord.Embed(
+            color=discord.Color.from_rgb(128,128,255)
+        )
+        embed.set_thumbnail(url=message.channel.guild.icon_url)
+        embed.add_field(name="Total Actions", value=total_actions, inline=True)
+        embed.add_field(name="Top Actions", value=top_actions_str, inline=True)
+
+        await message.channel.send(embed=embed)
+
+    add_action(message, "stats", con)
+    
 
 async def help_message(message, con):
     help_message = f"""
