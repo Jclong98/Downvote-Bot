@@ -307,7 +307,7 @@ async def mega(message, con):
             # print(f"https://cdn.discordapp.com/emojis/{gif_id}.gif")
             # the id is [1:-1] to get rid of the : and > that are part of the regex
             await message.channel.send(f"https://cdn.discordapp.com/emojis/{gif_id[1:-1]}.gif")
-            add_action(message, f"mega'd https://cdn.discordapp.com/emojis/{gif_id}.gif", con)
+            add_action(message, "mega'd", con)
 
     png_pattern = re.compile(r"<:[\w\d]+:\d+>")
     png_matches = png_pattern.findall(message.content)
@@ -322,7 +322,7 @@ async def mega(message, con):
         for png_id in png_id_matches:
             # print(f"https://cdn.discordapp.com/emojis/{png_id}.png")
             # the id is [1:-1] to get rid of the : and > that are part of the regex
-            await message.channel.send(f"https://cdn.discordapp.com/emojis/{png_id[1:-1]}.png")
+            await message.channel.send(f"https://cdn.discordapp.com/emojis/{png_id[2:-2]}.png")
             add_action(message, f"mega'd https://cdn.discordapp.com/emojis/{png_id}.png", con)
 
 
