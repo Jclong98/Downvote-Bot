@@ -13,6 +13,7 @@ import discord
 from discord.ext import commands
 
 from actions import *
+from tools import has_keywords
 
 # spawns connections to the database
 conn = sqlite3.connect("db.sqlite")
@@ -84,7 +85,7 @@ async def on_message(message):
         add_action(message, "dooted", conn)
 
     # thumbs up
-    if 'downvote bot' in message.content.lower() or 'downvotebot' in message.content.lower():
+    if has_keywords(message.content.lower(), ['downvotebot', 'downvote bot', 'dvb']):
         await message.add_reaction("👍")
         add_action(message, "Thumbs Upped", conn)
 
@@ -103,7 +104,7 @@ async def on_message(message):
         await party(message, conn)
 
     # send_vreddit
-    if 'www.reddit.com' in message.content.lower() or 'redd.it' in message.content.lower():
+    if has_keywords(message.content.lower(), ['redd.it', 'www.reddit.com']):
         await send_vreddit(message, conn)
         
     # superupvote
@@ -137,7 +138,7 @@ async def on_message(message):
         await help_message(message, conn)
 
     # trap
-    if 'trap' in message.content.lower() or "traps" in message.content.lower() or "trapped" in message.content.lower():
+    if has_keywords(message.content.lower(), ['traps']):
         await message.add_reaction("🇹")
         await message.add_reaction("🇷")
         await message.add_reaction("🇦")
@@ -155,12 +156,20 @@ async def on_message(message):
         await message.add_reaction("👈")
         await message.add_reaction("😎")
         await message.add_reaction("👉")
+        add_action(message, "zooped", conn)
 
+    # sans
     if message.content.lower().startswith("#sans"):
         await sans(message, conn)
 
+    # stats
     if message.content.lower().startswith("#stats"):
         await stats(message, conn)
+
+    # secret santa
+    if message.content.lower().startswith(("#secretsanta", '#ss')):
+        await secret_santa(message, conn)
+
 
 
 if __name__ == "__main__":

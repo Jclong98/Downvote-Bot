@@ -5,14 +5,14 @@ things and interact with the database
 
 import asyncio
 import json
+import os
 import random
 import re
 import sqlite3
+import subprocess
 from datetime import datetime
 from tempfile import TemporaryDirectory
 from time import time
-import os
-import subprocess
 
 import discord
 import praw
@@ -247,7 +247,9 @@ async def owo(message, con):
         await message.channel.send("OwO")
     else:
         await message.channel.send(random.choice(owos))
-    
+
+    add_action(message, "owo'd", con)
+
 
 async def upvote(message, con):
     """if a user is mentioned, send a message with upvotes 
@@ -457,6 +459,7 @@ async def download_vreddit(message, con, url):
         )
         add_action(message, "sent vreddit", con)
 
+
 async def send_vreddit(message, con):
     """searches a message for reddit links, and for
     each on it will try to download and send a vreddit video"""
@@ -466,9 +469,11 @@ async def send_vreddit(message, con):
         if 'www.reddit.com' in word or 'v.redd.it' in word:
             await download_vreddit(message, con, word)
 
+
 async def invite(message, con):
     await message.channel.send("Use this link to invite me to other servers https://discordapp.com/api/oauth2/authorize?client_id=412495164200714251&permissions=54000704&scope=bot")
     add_action(message, "invited", con)
+
 
 async def sans(message, con):
     """dvb joins the channel of whoever sent the command 
@@ -609,6 +614,62 @@ async def stats(message, con):
 
     add_action(message, "stats", con)
     
+async def secret_santa(message, con):
+
+    # 1. send message
+    m = await message.channel.send("5")
+    await m.add_reaction("🎁")
+
+    for i in range(5, 0, -1):
+
+        await m.edit(content=i)
+        await asyncio.sleep(1)
+
+    await m.edit(content="Times up!")
+
+
+    # 2. get participants
+    m = await message.channel.fetch_message(m.id)
+    for reaction in m.reactions:
+        if reaction.emoji == "🎁":
+            users = await reaction.users().flatten()
+    
+
+    # 3. pair up participants and recipients
+    users = [user for user in users if not user.bot]
+
+    # checking if there are enough people
+    if len(users) < 2:
+        await m.edit(content="Not enough participants :(")
+        return
+
+    recipients = users.copy()
+    random.shuffle(recipients)
+
+    pairs = {}
+    for user in users:
+        
+        recipient = recipients.pop()
+        pairs[user] = recipient
+
+        # if the user matches with themself, draw a different user
+        if pairs[user] == user:
+            
+            # getting a new recipient
+            pairs[user] = recipients.pop()
+
+            # adding the original recipient back into the pool
+            recipients.append(recipient)
+
+
+    # 4. send each user a message telling them who they got
+    for user, recipient in pairs.items():
+      
+        await user.send(f"You got {recipient.name} for secret santa! Make sure you get them a good gift!")
+
+    add_action(message, "secret santa'd", con)
+    
+
 
 async def help_message(message, con):
     help_message = f"""
@@ -656,18 +717,14 @@ Commands: (prefix: #)
 `numberfifteen`
   -burger king foot lettuce
 
+`sans` <seconds>
+  - sans undertale will come to your server for a number of seconds :o
+
+`secretsanta` or `ss`
+  -Secret Santa!
+  -react to the present on the message that gets sent to join a secret santa
+  -Downvote Bot will send you a message with the name of who you got
 """
-
-# removed functionalities
-# `randomword` <number of letters>
-#   -creates a brand new word with a number of input random letters
-#   -if no number is input, the amount of letters defaults to 4
-
-# `ss`
-#   -Secret Santa!
-#   -react to the present on the message that gets sent to join a secret santa
-#   -Downvote Bot will send you a message with the name of who you got
-
 
     embed = discord.Embed(
         description = help_message,
