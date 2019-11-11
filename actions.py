@@ -617,6 +617,12 @@ async def stats(message, con):
     
 
 async def secret_santa(message, con):
+    """
+    1. send message
+    2. get participants
+    3. pair up participants and recipients
+    4. send each user a message telling them who they got
+    """
 
     # 1. send message
     m = await message.channel.send("5")
