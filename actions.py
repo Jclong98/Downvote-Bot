@@ -604,6 +604,7 @@ async def stats(message, con):
 
 
         embed = discord.Embed(
+            title=f"{message.guild.name}'s Stats:",
             color=discord.Color.from_rgb(128,128,255)
         )
         embed.set_thumbnail(url=message.channel.guild.icon_url)
@@ -614,6 +615,7 @@ async def stats(message, con):
 
     add_action(message, "stats", con)
     
+
 async def secret_santa(message, con):
 
     # 1. send message
