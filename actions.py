@@ -54,6 +54,10 @@ def add_action(message, action, con):
     con: an sqlite database connection
     """
 
+    # no logging on dms. database isnt set up right for it
+    if type(message.channel) == discord.channel.DMChannel:
+        return
+
     # inserting a record into the db
     with con as c:
         c.execute(
@@ -206,6 +210,10 @@ async def votelist(message, vote, con):
 async def vote(message, con):
     """react to a message with an up/downvote 
     based on what is in the votelists for that server"""
+
+    # no reactions in dms
+    if type(message.channel) == discord.channel.DMChannel:
+        return
 
     with con as c:
         voteables = c.execute(
@@ -615,26 +623,36 @@ async def stats(message, con):
 
     add_action(message, "stats", con)
     
+def get_ss_embed(description):
+    return discord.Embed(
+        title="🎅 Secret Santa! 🎅",
+        color=discord.Color.from_rgb(0, 255, 0),
+        description=description
+    )
 
 async def secret_santa(message, con):
     """
     1. send message
     2. get participants
     3. pair up participants and recipients
-    4. send each user a message telling them who they got
+    4. send each user a message telling them who they got 
     """
 
+    wait_time = 30
+    try:
+        wait_time = int(message.content.split()[1])
+    except:
+        pass
+
     # 1. send message
-    m = await message.channel.send("5")
+    embed = get_ss_embed(f"Secret santa sign up ends in {wait_time}")
+    m = await message.channel.send(embed=embed)
     await m.add_reaction("🎁")
 
-    for i in range(5, 0, -1):
+    for i in range(wait_time, 0, -1):
 
-        await m.edit(content=i)
+        await m.edit(embed=get_ss_embed(f"Secret santa sign up ends in {i}"))
         await asyncio.sleep(1)
-
-    await m.edit(content="Times up!")
-
 
     # 2. get participants
     m = await message.channel.fetch_message(m.id)
@@ -648,8 +666,11 @@ async def secret_santa(message, con):
 
     # checking if there are enough people
     if len(users) < 2:
-        await m.edit(content="Not enough participants :(")
+        await m.edit(embed=get_ss_embed("There were not enough participants :("))
         return
+
+    else:
+        await m.edit(embed=get_ss_embed(f"There are {len(users)} participants!"))
 
     recipients = users.copy()
     random.shuffle(recipients)
@@ -673,7 +694,7 @@ async def secret_santa(message, con):
     # 4. send each user a message telling them who they got
     for user, recipient in pairs.items():
       
-        await user.send(f"You got {recipient.name} for secret santa! Make sure you get them a good gift!")
+        await user.send(f"You got {recipient.discriminator} for secret santa! Make sure you get them a good gift!")
 
     add_action(message, "secret santa'd", con)
     
@@ -736,7 +757,7 @@ Commands: (prefix: #)
 
     embed = discord.Embed(
         description = help_message,
-        color=0x8080ff
+        color=discord.Color.from_rgb(128,128,255)
     )
 
     embed.set_footer(text=f"Requested by: {message.author}", icon_url=message.author.avatar_url)
