@@ -623,7 +623,9 @@ async def stats(message, con):
 
     add_action(message, "stats", con)
     
+
 def get_ss_embed(description):
+    """a function used by secret_santa to get the same embed every time"""
     return discord.Embed(
         title="🎅 Secret Santa! 🎅",
         color=discord.Color.from_rgb(0, 255, 0),
@@ -694,7 +696,7 @@ async def secret_santa(message, con):
     # 4. send each user a message telling them who they got
     for user, recipient in pairs.items():
       
-        await user.send(f"You got {recipient.discriminator} for secret santa! Make sure you get them a good gift!")
+        await user.send(f"You got {recipient.name}#{recipient.discriminator} for secret santa! Make sure you get them a good gift!")
 
     add_action(message, "secret santa'd", con)
     
