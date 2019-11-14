@@ -18,6 +18,8 @@ import discord
 import praw
 import requests
 
+from tools import img_to_ascii
+
 # loading credentials from file
 creds = json.load(open("./credentials.json"))
 
@@ -700,6 +702,40 @@ async def secret_santa(message, con):
 
     add_action(message, "secret santa'd", con)
     
+
+async def asciify(message, con):
+    """
+    1. finds an image from a given url
+    2. converts it to ascii color blocks
+    3. sends messages containing the image
+    """
+
+    try:
+        url = message.content.split()[1]
+    except:
+        message.channel.say("Could not find a specified image. `#asciify <url to image>`")
+        return
+
+    try:
+        ascii_img = img_to_ascii(url)
+    except:
+        message.channel.say("I couldn't find that image 😔")
+        return
+    
+    # send rows of characters 20 lines at a time.
+    # each message can be 2000 characters long and each line has 100 characters
+    while len(ascii_img) > 0:
+        msg = '```'
+
+        for row in ascii_img[:20]:
+            msg += ''.join(row) + '\n'
+
+        msg += '```'
+        await message.channel.send(msg)
+
+        del ascii_img[:20]
+                
+    add_action(message, "asciified", con)
 
 
 async def help_message(message, con):

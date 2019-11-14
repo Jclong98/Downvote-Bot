@@ -170,6 +170,10 @@ async def on_message(message):
     if message.content.lower().startswith(("#secretsanta", '#ss')):
         await secret_santa(message, conn)
 
+    # asciify
+    if message.content.lower().startswith("#asciify"):
+        await asciify(message, conn)
+
 
 
 if __name__ == "__main__":
@@ -178,9 +182,9 @@ if __name__ == "__main__":
     creds = json.load(open("./credentials.json"))
 
     # testbot
-    # bot.run(creds['discord_secret_key_testbot'])
+    bot.run(creds['discord_secret_key_testbot'])
 
     # downvotebot
-    bot.run(creds['discord_secret_key'])
+    # bot.run(creds['discord_secret_key'])
 
 
