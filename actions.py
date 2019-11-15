@@ -304,39 +304,21 @@ async def mega(message, con):
     link to them in chat. This effectively enlarges them if 
     their resolution is high enough"""
 
-    # regex pattern to find animated emojis
-    gif_pattern = re.compile(r"<a:[\w\d]+:\d+>")
-    gif_matches = gif_pattern.findall(message.content)
+    custom_emojis = re.findall(r'<:\w*:\d*>', message.content)
+    custom_animated_emojis = re.findall(r'<a:\w*:\d*>', message.content)
 
-    for match in gif_matches:
-        # print(match)
+    for e in custom_emojis:
+        e_id = e.split(":")[2].replace('>', '')
 
-        emoji_id_pattern = re.compile(r":\d+>")
+        await message.channel.send(f"https://cdn.discordapp.com/emojis/{e_id}.png")
+        add_action(message, "mega'd", con)
 
-        gif_id_matches = emoji_id_pattern.findall(match)
+    for e in custom_animated_emojis:
+        e_id = e.split(":")[2].replace('>', '')
 
-        for gif_id in gif_id_matches:
-            # print(f"https://cdn.discordapp.com/emojis/{gif_id}.gif")
-            # the id is [1:-1] to get rid of the : and > that are part of the regex
-            await message.channel.send(f"https://cdn.discordapp.com/emojis/{gif_id[1:-1]}.gif")
-            add_action(message, "mega'd", con)
-
-    png_pattern = re.compile(r"<:[\w\d]+:\d+>")
-    png_matches = png_pattern.findall(message.content)
-
-    for match in png_matches:
-        # print(match)
-
-        emoji_id_pattern = re.compile(r":\d+>")
-
-        png_id_matches = emoji_id_pattern.findall(match)
-
-        for png_id in png_id_matches:
-            # print(f"https://cdn.discordapp.com/emojis/{png_id}.png")
-            # the id is [1:-1] to get rid of the : and > that are part of the regex
-            await message.channel.send(f"https://cdn.discordapp.com/emojis/{png_id[2:-2]}.png")
-            add_action(message, f"mega'd https://cdn.discordapp.com/emojis/{png_id}.png", con)
-
+        await message.channel.send(f"https://cdn.discordapp.com/emojis/{e_id}.gif")
+        add_action(message, "mega'd", con)
+ 
 
 async def conga(message, con):
     """sends a message with a given number of congas"""
@@ -356,6 +338,7 @@ async def conga(message, con):
 
     except:
         pass
+
 
 # the list of emoji keys for the below function
 emoji_keys = {'a':'🇦', 'b':'🅱️', 'c':'🇨', 'd':'🇩', 'e':'🇪', 'f':'🇫', 'g':'🇬', 'h':'🇭', 'i':'🇮', 'j':'🇯', 'k':'🇰', 'l':'🇱', 'm':'🇲',
@@ -713,13 +696,13 @@ async def asciify(message, con, max_width=100):
     try:
         url = message.content.split()[1]
     except:
-        message.channel.say("Could not find a specified image. `#asciify <url to image>`")
+        message.channel.send("Could not find a specified image. `#asciify <url to image>`")
         return
 
     try:
         ascii_img = img_to_ascii(url, max_width=max_width)
     except:
-        message.channel.say("I couldn't find that image 😔")
+        message.channel.send("I couldn't find that image 😔")
         return
     
     # send rows of characters 20 lines at a time.
