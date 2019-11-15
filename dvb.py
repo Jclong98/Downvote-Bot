@@ -171,7 +171,9 @@ async def on_message(message):
         await secret_santa(message, conn)
 
     # asciify
-    if message.content.lower().startswith("#asciify"):
+    if message.content.lower().startswith("#asciifym"):
+        await asciify(message, conn, max_width=40)
+    elif message.content.lower().startswith("#asciify"):
         await asciify(message, conn)
 
 
@@ -186,5 +188,3 @@ if __name__ == "__main__":
 
     # downvotebot
     bot.run(creds['discord_secret_key'])
-
-

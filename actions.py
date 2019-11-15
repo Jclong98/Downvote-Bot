@@ -703,7 +703,7 @@ async def secret_santa(message, con):
     add_action(message, "secret santa'd", con)
     
 
-async def asciify(message, con):
+async def asciify(message, con, max_width=100):
     """
     1. finds an image from a given url
     2. converts it to ascii color blocks
@@ -717,7 +717,7 @@ async def asciify(message, con):
         return
 
     try:
-        ascii_img = img_to_ascii(url)
+        ascii_img = img_to_ascii(url, max_width=max_width)
     except:
         message.channel.say("I couldn't find that image 😔")
         return
@@ -787,10 +787,20 @@ Commands: (prefix: #)
 `sans` <seconds>
   - sans undertale will come to your server for a number of seconds :o
 
+`stats` <@user>
+  -Sends some stats about how many times downvotebot has reacted to a user
+  -calling stats without a user will send server stats
+
 `secretsanta` or `ss`
   -Secret Santa!
   -react to the present on the message that gets sent to join a secret santa
   -Downvote Bot will send you a message with the name of who you got
+
+`asciify` <url to image>
+  -Sends the given image in chat as a series of ascii shade blocks
+
+`asciifym` <url to image>
+  -Same as asciify but limits the width to 40 characters for mobile
 """
 
     embed = discord.Embed(
