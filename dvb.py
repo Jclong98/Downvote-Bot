@@ -183,8 +183,16 @@ if __name__ == "__main__":
     # loading credentials
     creds = json.load(open("./credentials.json"))
 
-    # testbot
-    # bot.run(creds['discord_secret_key_testbot'])
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-d', '--debug', action='store_true')
+    args = parser.parse_args()
 
-    # downvotebot
-    bot.run(creds['discord_secret_key'])
+    if args.debug:
+        # testbot
+        print("DEBUG MODE")
+        bot.run(creds['discord_secret_key_testbot'])
+
+    else:
+        # downvotebot
+        bot.run(creds['discord_secret_key'])

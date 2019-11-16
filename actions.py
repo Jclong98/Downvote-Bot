@@ -696,13 +696,13 @@ async def asciify(message, con, max_width=100):
     try:
         url = message.content.split()[1]
     except:
-        message.channel.send("Could not find a specified image. `#asciify <url to image>`")
+        await message.channel.send("Could not find a specified image. `#asciify <url to image>`")
         return
 
     try:
         ascii_img = img_to_ascii(url, max_width=max_width)
     except:
-        message.channel.send("I couldn't find that image 😔")
+        await message.channel.send("I couldn't find that image 😔")
         return
     
     # send rows of characters 20 lines at a time.
