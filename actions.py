@@ -681,7 +681,7 @@ async def secret_santa(message, con):
     # 4. send each user a message telling them who they got
     for user, recipient in pairs.items():
       
-        await user.send(f"You got {recipient.name}#{recipient.discriminator} for secret santa! Make sure you get them a good gift!")
+        await user.send(f"You got {recipient.mention} for secret santa! Make sure you get them a good gift!")
 
     add_action(message, "secret santa'd", con)
     
@@ -770,7 +770,7 @@ Commands: (prefix: #)
 `sans` <seconds>
   - sans undertale will come to your server for a number of seconds :o
 
-`stats` <@user>
+`stats` <user>
   -Sends some stats about how many times downvotebot has reacted to a user
   -calling stats without a user will send server stats
 
@@ -795,31 +795,3 @@ Commands: (prefix: #)
 
     await message.channel.send(embed=embed)
     add_action(message, "helped", con)
-
-if __name__ == "__main__":
-
-    conn = sqlite3.connect("db.sqlite")
-    # conn = sqlite3.connect(":memory:")
-
-    with conn as c:
-
-        actions = c.execute(
-        """
-            select a.guild, a.guild_id, v.* 
-            from actions a, voteables v
-            where a.action_id = v.action_id
-            and v.phrase = 'oof'
-            and guild_id = '412495298707849216'
-
-        """
-        ).fetchall()
-
-        for record in actions:
-            print(record)
-
-        c.execute(
-            """
-            
-            
-            """
-        )
