@@ -48,7 +48,7 @@ def img_to_ascii(url, max_width=100):
     aspect_ratio = max_width/width
 
     # resizing image based on compression factor. -2 because of new line characters
-    img = img.resize((int(width*aspect_ratio-2), int(((height*aspect_ratio)-2)*.55)))
+    img = img.resize((int(width*aspect_ratio-2), int(((height*aspect_ratio)-2)*.45)))
     width, height = img.size
 
     # converting to black and white

@@ -609,13 +609,18 @@ async def stats(message, con):
     add_action(message, "stats", con)
     
 
-def get_ss_embed(description):
+def get_ss_embed(description, max_price=None):
     """a function used by secret_santa to get the same embed every time"""
-    return discord.Embed(
+    e = discord.Embed(
         title="🎅 Secret Santa! 🎅",
         color=discord.Color.from_rgb(0, 255, 0),
         description=description
     )
+
+    if max_price:
+        e.add_field("Max Price", value=f"${max_price:,.02f}")
+    
+    return e
 
 async def secret_santa(message, con):
     """
@@ -625,11 +630,16 @@ async def secret_santa(message, con):
     4. send each user a message telling them who they got 
     """
 
-    wait_time = 30
     try:
         wait_time = int(message.content.split()[1])
     except:
-        pass
+        wait_time = 30
+
+    try:
+        max_price = float(message.content.split()[2])
+    except:
+        max_price = None
+
 
     # 1. send message
     embed = get_ss_embed(f"Secret santa sign up ends in {wait_time}")
@@ -638,7 +648,7 @@ async def secret_santa(message, con):
 
     for i in range(wait_time, 0, -1):
 
-        await m.edit(embed=get_ss_embed(f"Secret santa sign up ends in {i}"))
+        await m.edit(embed=get_ss_embed(f"Secret santa sign up ends in {i}", max_price))
         await asyncio.sleep(1)
 
     # 2. get participants
@@ -653,11 +663,13 @@ async def secret_santa(message, con):
 
     # checking if there are enough people
     if len(users) < 2:
+        # there weren't enough
         await m.edit(embed=get_ss_embed("There were not enough participants :("))
         return
 
     else:
-        await m.edit(embed=get_ss_embed(f"There are {len(users)} participants!"))
+        # there were enough
+        await m.edit(embed=get_ss_embed(f"Times up! There are {len(users)} participants!", max_price))
 
     recipients = users.copy()
     random.shuffle(recipients)
@@ -681,7 +693,10 @@ async def secret_santa(message, con):
     # 4. send each user a message telling them who they got
     for user, recipient in pairs.items():
       
-        await user.send(f"You got {recipient.mention} for secret santa! Make sure you get them a good gift!")
+        await user.send(embed=get_ss_embed(
+            f"You got {recipient.mention} for secret santa! Make sure you get them a good gift!", 
+            max_price
+        ))
 
     add_action(message, "secret santa'd", con)
     
