@@ -618,7 +618,7 @@ def get_ss_embed(description, max_price=None):
     )
 
     if max_price:
-        e.add_field("Max Price", value=f"${max_price:,.02f}")
+        e.add_field(name="Max Price", value=f"${max_price:,.02f}")
     
     return e
 
@@ -630,16 +630,18 @@ async def secret_santa(message, con):
     4. send each user a message telling them who they got 
     """
 
+
+    wait_time = 30
     try:
         wait_time = int(message.content.split()[1])
     except:
-        wait_time = 30
+        pass
 
+    max_price = None
     try:
         max_price = float(message.content.split()[2])
     except:
-        max_price = None
-
+        pass
 
     # 1. send message
     embed = get_ss_embed(f"Secret santa sign up ends in {wait_time}")
@@ -789,7 +791,7 @@ Commands: (prefix: #)
   -Sends some stats about how many times downvotebot has reacted to a user
   -calling stats without a user will send server stats
 
-`secretsanta` or `ss`
+`secretsanta` or `ss` <duration> <max price>
   -Secret Santa!
   -react to the present on the message that gets sent to join a secret santa
   -Downvote Bot will send you a message with the name of who you got
