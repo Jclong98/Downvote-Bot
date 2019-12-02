@@ -10,7 +10,7 @@ import random
 import re
 import sqlite3
 import subprocess
-from datetime import datetime
+from datetime import datetime, timedelta
 from tempfile import TemporaryDirectory
 from time import time
 
@@ -647,10 +647,24 @@ async def secret_santa(message, con):
     embed = get_ss_embed(f"Secret santa sign up ends in {wait_time}")
     m = await message.channel.send(embed=embed)
     await m.add_reaction("🎁")
+    await m.add_reaction("❌")
 
     for i in range(wait_time, 0, -1):
 
-        await m.edit(embed=get_ss_embed(f"Secret santa sign up ends in {i}", max_price))
+        await m.edit(embed=get_ss_embed(f"Secret santa sign up ends in {timedelta(seconds=i)}", max_price))
+
+        # getting reactions for cancel button
+        m = await message.channel.fetch_message(m.id)
+        for reaction in m.reactions:
+            if reaction.emoji == "❌":
+                users = await reaction.users().flatten()
+
+                # if a user reacts to the x, the length of users will be > 1
+                if len(users) > 1:
+                    
+                    await m.edit(embed=get_ss_embed(f"Secret santa sign up canceled"))
+                    return
+
         await asyncio.sleep(1)
 
     # 2. get participants
