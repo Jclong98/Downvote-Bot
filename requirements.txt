@@ -7,7 +7,7 @@ chardet==3.0.4
 discord.py==1.2.5
 idna==2.8
 multidict==4.5.2
-Pillow==6.2.1
+Pillow==8.2.0
 praw==6.4.0
 prawcore==1.0.1
 pycparser==2.19
